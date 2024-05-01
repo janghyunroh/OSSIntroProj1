@@ -41,23 +41,39 @@ menu7() {
 ############################################################################################
 
 # 1. input error handling
-# 1) if not given 3 params
-# 2) if at least 1 of them are not csv
+
+# the input must 'speicifically' be as following
+# ./script teams.csv players.csv matches.csv
+
+# teams.csv 
+# players.csv
+# matches.csv
 
 
-#
-if [ $# -ne 3 ]; then
-	echo "usage: $0 file1 file2 file3"
+#1) if not 3 params 
+#if [ $# -ne 3 ]; then
+#	echo "wrong input: you must give 3 files as input."
+#	echo "usage: $0 teams.csv players.csv matches.csv"
+#	exit 1
+#fi
+
+#if not correct names or wrong order
+if [ "$*" != "teams.csv players.csv matches.csv" ]; then
+	echo "wrong input: you must give 3 specific csv files in following order"
+	echo "usage: $0 teams.csv palyers.csv matches.csv"
 	exit 1
 fi
 
-#
-for file in "$@"; do
-	if ! [[ "$file" =~ \.csv$ ]]; then
-		echo "usage: $0 file1 file2 file3"
-		exit 1
-	fi
-done
+#for file in "$@"; do
+#	if ! [[ "$file" =~ \.csv$ ]]; then
+#		echo "wrong input: all files should be correct csv file in following order."
+#		echo "usage: $0 teams.csv players.csv matches.csv"
+#		exit 1
+#	fi
+#done
+
+#if not right order or wrong file name
+
 
 # 2. 
 echo "************OSS1 - Project1************"
