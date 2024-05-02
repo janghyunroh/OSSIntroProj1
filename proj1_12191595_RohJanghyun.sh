@@ -3,24 +3,27 @@
 #input order: teams, players, matches
 ##########################################################################################
 
+# global variable - filenames
+
 teamsfile="$1"
 playersfile="$2"
 matchesfile="$3"
 
+# functions for each menu
+
 menu1() {
 
-# players.csv format
+#uses data from players.csv
 
+# [players.csv format]
 # 1. Full_name (lookup)
 # 2. age
 # 3. position
-# 4. Current Club (p)
+# 4. Current Club (print)
 # 5. nationality
-# 6. appearance_overall (p)
-# 7. goals_overall (p)
-# 8. assists_overall (p)
-
-	#players.csv comes 2nd
+# 6. appearance_overall (print)
+# 7. goals_overall (print)
+# 8. assists_overall (print)
 
 	read -p "Do you want to get the Heung-Min Son's data? (y/n) : " ans
 	if [ "$ans" = "y" ]; then
@@ -32,14 +35,15 @@ menu1() {
 
 menu2() { 
 
-# teams.csv format
+#uses data from teams.csv
 
-# 1. common_name (p)
-# 2. wins  (u)
-# 3. draws (u)
-# 4. losses(u)
+# [teams.csv format]
+# 1. common_name (print)
+# 2. wins  (use)
+# 3. draws (use)
+# 4. losses(use)
 # 5. points_per_game
-# 6. league_position (lookup)
+# 6. league_position (lookup & print)
 # 7. cards
 # 8. shots
 # 9. fouls
@@ -47,10 +51,32 @@ menu2() {
 	read -p "What do you want to get the team data of league_position[1~20] : " league_position
 	cat "$teamsfile" | awk -F, -v pos="$league_position" '$6==pos{printf("%s %s %f\n\n", pos, $1, $2/($2+$3+$4))}' 
 }
+
 menu3() { 
+
+#uses data from matches.csv
+
+# [matches.csv format]
+# 1. date_GMT (print)
+# 2. attendance (lookup & print)
+# 3. home_team_name (print)
+# 4. away_team_name (print)
+# 5. home_team_goal_count
+# 6. away_team_goal_count
+# 7. stadium_name (print)
+
+# seperate -> sort -> seperate again to print in a format
+# need to add additional seperator before sorting for later seperation
+
 	read -p "Do you want to know Top-3 attendance data and average attendance? (y/n) : " ans 
 	if [ "$ans" = "y" ]; then
+		echo "***Top-3 Attendance Match***"
 		echo ""
+		cat "$matchesfile" | 
+		awk -F, 'NR > 1 { print $2 ";" $3 " vs " $4 " "  "(" $1 ")" ";" $7 }' | 
+		sort -nr -k1,1 | 
+		head -n 3 | 
+		awk -F";" '{printf "%s\n%s %s\n\n", $2, $1, $3}'
 	fi
 }
 menu4() { 
