@@ -1,11 +1,32 @@
 #!/bin/bash
 
+#input order: teams, players, matches
 ##########################################################################################
 
-menu1() { 
+teamsfile="$1"
+playersfile="$2"
+matchesfile="$3"
+
+menu1() {
+# players.csv format
+
+# 1. Full_name (must lookup)
+# 2. age
+# 3. position
+# 4. Current Club (p)
+# 5. nationality
+# 6. appearance_overall (p)
+# 7. goals_overall (p)
+# 8. assists_overall (p)
+
+	#players.csv comes 2nd
+
 	read -p "Do you want to get the Heung-Min Son's data? (y/n) : " ans
 	if [ "$ans" = "y" ]; then
+		
+		cat "$playersfile" | awk -F, '$1 == "Heung-Min Son" { printf "Team: %s, Appearance: %s, Goal: %s, Assist: %s\n", $4, $6, $7, $8}' 
 		echo ""
+
 	fi
 }
 menu2() { 
