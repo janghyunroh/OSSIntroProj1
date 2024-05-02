@@ -8,9 +8,10 @@ playersfile="$2"
 matchesfile="$3"
 
 menu1() {
+
 # players.csv format
 
-# 1. Full_name (must lookup)
+# 1. Full_name (lookup)
 # 2. age
 # 3. position
 # 4. Current Club (p)
@@ -24,13 +25,27 @@ menu1() {
 	read -p "Do you want to get the Heung-Min Son's data? (y/n) : " ans
 	if [ "$ans" = "y" ]; then
 		
-		cat "$playersfile" | awk -F, '$1 == "Heung-Min Son" { printf "Team: %s, Appearance: %s, Goal: %s, Assist: %s\n", $4, $6, $7, $8}' 
-		echo ""
-
+		cat "$playersfile" | awk -F, '$1 == "Heung-Min Son" { printf "Team: %s, Appearance: %s, Goal: %s, Assist: %s\n\n", $4, $6, $7, $8}' 
+		
 	fi
 }
+
 menu2() { 
-	read -p "What do you want to get the team data of league_position[1~20] : " team_no 
+
+# teams.csv format
+
+# 1. common_name (p)
+# 2. wins  (u)
+# 3. draws (u)
+# 4. losses(u)
+# 5. points_per_game
+# 6. league_position (lookup)
+# 7. cards
+# 8. shots
+# 9. fouls
+
+	read -p "What do you want to get the team data of league_position[1~20] : " league_position
+	cat "$teamsfile" | awk -F, -v pos="$league_position" '$6==pos{printf("%s %s %f\n\n", pos, $1, $2/($2+$3+$4))}' 
 }
 menu3() { 
 	read -p "Do you want to know Top-3 attendance data and average attendance? (y/n) : " ans 
