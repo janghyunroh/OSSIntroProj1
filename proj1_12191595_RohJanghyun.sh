@@ -1,16 +1,15 @@
 #!/bin/bash
 
 #input order: teams, players, matches
-##########################################################################################
-
 # global variable - filenames
 
 teamsfile="$1"
 playersfile="$2"
 matchesfile="$3"
 
-# functions for each menu
 
+# functions for each menu
+##########################################################################################
 menu1() {
 
 #uses data from players.csv
@@ -79,26 +78,67 @@ menu3() {
 		awk -F";" '{printf "%s\n%s %s\n\n", $2, $1, $3}'
 	fi
 }
-menu4() { 
+
+menu4() {
+
+#uses data from teams.csv & 
+
+#
 	read -p "Do you want to get each team's ranking and the highest-scoring player? (y/n) : " ans
 	if [ "$ans" = "y" ]; then
-		echo ""
+	
+	#awk variable that will use
+	#team_rank[] : 
+	#team_goals[] : 
+
+	awk -F, '
+    NR == FNR && NR > 1 { team_rank[$6] = $1; next;}
+    FNR > 1 {  team_goals[$4][$1] = $7; }
+    END {
+        
+        for (rank in team_rank) {
+            print rank, team_rank[rank]; 
+
+            max_goals = 0; max_scorer = "";
+            for (player in team_goals[team_rank[rank]]) {
+                if (team_goals[team_rank[rank]][player] > max_goals) {
+                    max_goals = team_goals[team_rank[rank]][player];
+                    max_scorer = player;
+                }
+            }
+    
+            print max_scorer, max_goals;
+            print "";  # 라인 간격
+        }
+    }
+	' "$teamsfile" "$playersfile"
 	fi
 }
+
 menu5() { 
 	read -p "Do you want to modify the format of date? (y/n) : " ans
 	if [ "$ans" = "y" ]; then
-		echo ""
+		
+		cat "$matchesfile" |
+		sed -E 's/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ([0-9]{1,2}) ([0-9]{4}) - ([0-9]{1,2}:[0-9]{2}(am|pm))/\3\/\1\/\2 \4/g' | \
+		sed -E 's/Jan/01/; s/Feb/02/; s/Mar/03/; s/Apr/04/; s/May/05/; s/Jun/06/; s/Jul/07/; s/Aug/08/; s/Sep/09/; s/Oct/10/; s/Nov/11/; s/Dec/12/' > matches_date_formatted.csv
+
+		#
+		grep -oE '[0-9]{4}/[0-9]{2}/[0-9]{2} [0-9]{1,2}:[0-9]{2}(am|pm)' matches_date_formatted.csv | head -n 10
+
+
+
 	fi
 }
+
 menu6() { 
 	echo "" 
 	read -p "Enter your team number : " team_no
 }
+
 menu7() {
 	echo "Bye!"
 }
-
 
 ############################################################################################
 
