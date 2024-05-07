@@ -85,6 +85,7 @@ menu4() {
 
 #
 	read -p "Do you want to get each team's ranking and the highest-scoring player? (y/n) : " ans
+	echo ""
 	if [ "$ans" = "y" ]; then
 	
 	#awk variable that will use
@@ -108,7 +109,7 @@ menu4() {
             }
     
             print max_scorer, max_goals;
-            print "";  # 라인 간격
+            print "";  
         }
     }
 	' "$teamsfile" "$playersfile"
@@ -123,21 +124,88 @@ menu5() {
 		sed -E 's/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ([0-9]{1,2}) ([0-9]{4}) - ([0-9]{1,2}:[0-9]{2}(am|pm))/\3\/\1\/\2 \4/g' | \
 		sed -E 's/Jan/01/; s/Feb/02/; s/Mar/03/; s/Apr/04/; s/May/05/; s/Jun/06/; s/Jul/07/; s/Aug/08/; s/Sep/09/; s/Oct/10/; s/Nov/11/; s/Dec/12/' > matches_date_formatted.csv
 
-		#
+		# write a file
+		# and then read from that file
 		grep -oE '[0-9]{4}/[0-9]{2}/[0-9]{2} [0-9]{1,2}:[0-9]{2}(am|pm)' matches_date_formatted.csv | head -n 10
 
-
-
 	fi
+	echo ""
 }
 
-menu6() { 
-	echo "" 
-	read -p "Enter your team number : " team_no
+menu6() {
+	
+	# use select, use team names from teams.csv as a list for select statement
+	# 
+
+	echo ""
+	IFS=$'\n' read -d '' -r -a team_names < <(awk -F, 'NR > 1 {print $1}' teams.csv)
+	
+	PS3="Enter your team number : "
+
+	select team in "${team_names[@]}"
+	do
+		if [ -n "$team" ]; then
+			
+			# if validate input, break and search for team name
+			echo ""
+			break
+		else
+			# else, try again
+			echo "Invalid selection, try again."
+		fi
+	done
+	
+	# search for team name(home) and get max goal diff games
+	# games[] = 
+	# when max_goal_diff is updated, erase former games array 
+
+	#matches.csv format
+
+	# $1 : date
+
+	# $3 : home team name
+	# $4 : away team name
+	# $5 : home team score
+	# $6 : away team score
+
+	# --> format must be : 
+	#[$1]
+	#[$3] [$5] vs [$6] [$4]
+
+
+	awk -F, -v team="$team" '
+
+	#Before lookup : init params
+	BEGIN {
+		max_goal_diff = 0;
+	}
+
+	#During lookup : update max_goal_diff and create / add to array
+	$3 == team {
+		goal_diff = $5 - $6;  
+		if (goal_diff > max_goal_diff) {
+			max_goal_diff = goal_diff;  
+			delete games;  
+		}
+		if (goal_diff == max_goal_diff) {
+			games[$1] = $3 " " $5 " vs " $6 " " $4;  
+		}
+	}
+
+	#After lookup : print
+	END {
+		for (date in games) {
+			print  date "\n"  games[date] "\n" ;
+		}
+	}
+	' matches.csv
+
+
 }
 
 menu7() {
 	echo "Bye!"
+	echo ""
 }
 
 ############################################################################################
@@ -182,6 +250,7 @@ echo "************OSS1 - Project1************"
 echo "*        StudentID : 12191595         *"
 echo "*        Name : Janghyun Roh          *"
 echo "***************************************"
+echo ""
 
 stop="N"
 
