@@ -7,6 +7,13 @@ teamsfile="$1"
 playersfile="$2"
 matchesfile="$3"
 
+# banner string for much cleaner interface 
+
+banner="
+************OSS1 - Project1************
+*        StudentID : 12191595         *
+*        Name : Janghyun Roh          *
+***************************************"
 
 # functions for each menu
 ##########################################################################################
@@ -26,9 +33,15 @@ menu1() {
 
 	read -p "Do you want to get the Heung-Min Son's data? (y/n) : " ans
 	if [ "$ans" = "y" ]; then
-		
+
+		clear
+		echo -e "$banner"
 		cat "$playersfile" | awk -F, '$1 == "Heung-Min Son" { printf "Team: %s, Appearance: %s, Goal: %s, Assist: %s\n\n", $4, $6, $7, $8}' 
-		
+	else
+		clear
+		echo -e "$banner"
+		echo ""
+		echo ""
 	fi
 }
 
@@ -46,8 +59,19 @@ menu2() {
 # 7. cards
 # 8. shots
 # 9. fouls
-
-	read -p "What do you want to get the team data of league_position[1~20] : " league_position
+	
+	appropriate_input="N"
+	until [ "$appropriate_input" = "Y" ] 
+	do
+		read -p "What do you want to get the team data of league_position[1~20] : " league_position
+		if [ "$league_position" -ge 1 -a "$league_position" -le 20 ]; then
+			appropriate_input="Y"
+		else
+			echo "invalid input. please put a number between 1 and 20."
+		fi
+	done
+	clear
+	echo -e "$banner"
 	cat "$teamsfile" | awk -F, -v pos="$league_position" '$6==pos{printf("%s %s %f\n\n", pos, $1, $2/($2+$3+$4))}' 
 }
 
@@ -69,6 +93,8 @@ menu3() {
 
 	read -p "Do you want to know Top-3 attendance data and average attendance? (y/n) : " ans 
 	if [ "$ans" = "y" ]; then
+		clear 
+		echo -e "$banner"
 		echo "***Top-3 Attendance Match***"
 		echo ""
 		cat "$matchesfile" | 
@@ -76,6 +102,11 @@ menu3() {
 		sort -nr -k1,1 | 
 		head -n 3 | 
 		awk -F";" '{printf "%s\n%s %s\n\n", $2, $1, $3}'
+	else 
+		clear
+		echo -e "$banner"
+		echo ""
+		echo ""
 	fi
 }
 
@@ -87,6 +118,9 @@ menu4() {
 	read -p "Do you want to get each team's ranking and the highest-scoring player? (y/n) : " ans
 	echo ""
 	if [ "$ans" = "y" ]; then
+
+		clear
+		echo -e "$banner"
 	
 	#awk variable that will use
 	#team_rank[] : 
@@ -109,16 +143,23 @@ menu4() {
             }
     
             print max_scorer, max_goals;
-            print "";  
+			print ""          
         }
     }
 	' "$teamsfile" "$playersfile"
+	else
+		clear
+		echo "$banner"
+		echo ""
+		echo ""
 	fi
 }
 
 menu5() { 
 	read -p "Do you want to modify the format of date? (y/n) : " ans
 	if [ "$ans" = "y" ]; then
+		clear
+		echo -e "$banner"
 		
 		cat "$matchesfile" |
 		sed -E 's/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ([0-9]{1,2}) ([0-9]{4}) - ([0-9]{1,2}:[0-9]{2}(am|pm))/\3\/\1\/\2 \4/g' | \
@@ -127,16 +168,23 @@ menu5() {
 		# write a file
 		# and then read from that file
 		grep -oE '[0-9]{4}/[0-9]{2}/[0-9]{2} [0-9]{1,2}:[0-9]{2}(am|pm)' matches_date_formatted.csv | head -n 10
-
+		echo ""
+		echo ""
+	else
+		clear
+		echo -e "$banner"
+		echo ""
+		echo ""
 	fi
-	echo ""
+	
 }
 
 menu6() {
 	
 	# use select, use team names from teams.csv as a list for select statement
 	# 
-
+	clear 
+	echo -e "$banner"
 	echo ""
 	IFS=$'\n' read -d '' -r -a team_names < <(awk -F, 'NR > 1 {print $1}' teams.csv)
 	
@@ -171,7 +219,9 @@ menu6() {
 	# --> format must be : 
 	#[$1]
 	#[$3] [$5] vs [$6] [$4]
-
+	
+	clear
+	echo "$banner"
 
 	awk -F, -v team="$team" '
 
@@ -200,7 +250,8 @@ menu6() {
 	}
 	' matches.csv
 
-
+	echo ""
+	
 }
 
 menu7() {
@@ -245,12 +296,16 @@ fi
 #if not right order or wrong file name
 
 
-# 2. 
-echo "************OSS1 - Project1************"
-echo "*        StudentID : 12191595         *"
-echo "*        Name : Janghyun Roh          *"
-echo "***************************************"
+# 2.
+clear
+echo -e "$banner"
 echo ""
+echo ""
+#echo "************OSS1 - Project1************"
+#echo "*        StudentID : 12191595         *"
+#echo "*        Name : Janghyun Roh          *"
+#echo "***************************************"
+#echo ""
 
 stop="N"
 
@@ -290,6 +345,9 @@ do
 		menu7
 		stop="Y"
 		;;
+	*)
+		clear 
+		echo -e "$banner"
 	esac
 done
 exit 0
